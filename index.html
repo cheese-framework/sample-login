@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login Form</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      /* CSS for styling the form */
+      .form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        background-color: #f2f2f2;
+        border-radius: 10px;
+      }
+      .form h2 {
+        margin-bottom: 30px;
+      }
+      .form .form-group {
+        margin-bottom: 20px;
+      }
+      .form .form-control {
+        border-radius: 5px;
+      }
+      .form .btn {
+        border-radius: 5px;
+        background-color: #4caf50;
+        color: white;
+      }
+      .form .btn:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body id="body"></body>
+</html>
+
+<script>
+  const body = document.getElementById("body");
+  const loggedInView = `<body>
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Home</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" 
+                >Hello <span id="user-email"></span
+              ></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="logout" style="cursor:pointer">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <h1 class="display-4">Welcome to the protected page</h1>
+      <p class="lead">This page is only accessible to logged in users</p>
+    </main>
+    <footer class="bg-dark text-white">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 text-center py-3">Copyright ©2022</div>
+        </div>
+      </div>
+    </footer>`;
+  const loggedOutView = `<div class="container mt-5">
+      <form class="form" id="login-form">
+        <h2 class="text-center">Login Form</h2>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" class="form-control" id="email" name="email" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+          />
+        </div>
+        <button type="submit" class="btn">Login</button>
+      </form>
+    </div>`;
+  const loggedIn = localStorage.getItem("user-data");
+  if (loggedIn) {
+    body.innerHTML = loggedInView;
+    const user = JSON.parse(loggedIn);
+    document.getElementById("user-email").innerText = user.email;
+    const logoutButton = document.getElementById("logout");
+    logoutButton.addEventListener("click", (e) => {
+      localStorage.clear();
+      window.location.reload();
+    });
+  } else {
+    body.innerHTML = loggedOutView;
+    const loginForm = document.getElementById("login-form");
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      // make sure all fields are filled
+      if (!email || !password) {
+        alert("Please enter your email and password");
+        return;
+      }
+      // Validate email format
+      if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+        alert("Invalid email address");
+        return;
+      }
+
+      // we have valid email address and password
+      // NOTE: we are allowing any email and password as long as they are valid :)
+      // store the session in local storage
+      localStorage.setItem(
+        "user-data",
+        JSON.stringify({ email, token: "TOKEN".toString(36) })
+      );
+      // redirect to secured page
+      window.location.reload();
+    });
+  }
+</script>
